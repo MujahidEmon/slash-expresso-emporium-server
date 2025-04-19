@@ -34,6 +34,7 @@ async function run() {
 
     const coffeeCollection = client.db('coffeeDB').collection('coffees')
     const usersCollection = client.db('coffeeDB').collection('users')
+    const ordersCollection = client.db('coffeeDB').collection('orders')
 
 
     // read multiple coffee data 
@@ -44,12 +45,28 @@ async function run() {
     })
 
 
+    // read multiple orders
+    app.get('/orders', async (req, res) => {
+      const cursor = ordersCollection.find();
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+
     // add data to database
     app.post('/coffees', async(req, res) => {
         const newCoffee = req.body;
         console.log(newCoffee);
         const result = await coffeeCollection.insertOne(newCoffee)
         res.send(result);
+    })
+
+    // add orders to database
+    app.post('/orders', async (req, res) => {
+      const newOrder = req.body;
+      console.log(newOrder);
+      const result = await ordersCollection.insertOne(newOrder);
+      res.send(result);
     })
 
     // delete a data from database
