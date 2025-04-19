@@ -76,6 +76,12 @@ async function run() {
         const result = await coffeeCollection.deleteOne(query);
         res.send(result)
     })
+    app.delete('/orders/:id', async(req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await ordersCollection.deleteOne(query);
+        res.send(result)
+    })
 
     // Update One
     app.put('/coffees/:id', async(req, res) => {
