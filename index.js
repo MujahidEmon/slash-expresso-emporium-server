@@ -47,7 +47,11 @@ async function run() {
 
     // read multiple orders
     app.get('/orders', async (req, res) => {
-      const cursor = ordersCollection.find();
+      let query = {};
+        if(req.query.status){
+          query = {status :req.query.status}
+        }
+      const cursor = ordersCollection.find(query);
       const result = await cursor.toArray();
       res.send(result)
     })
@@ -69,13 +73,14 @@ async function run() {
     app.post('/complains', async(req, res) => {
         const newComplain = req.body;
         console.log(newComplain);
-        const result = await coffeeCollection.insertOne(newComplain)
+        const result = await complainsCollection.insertOne(newComplain)
         res.send(result);
     })
 
     // add orders to database
     app.post('/orders', async (req, res) => {
       const newOrder = req.body;
+      
       console.log(newOrder);
       const result = await ordersCollection.insertOne(newOrder);
       res.send(result);
@@ -116,11 +121,35 @@ async function run() {
         res.send(result)
     })
 
+
+    app.put('/orders/:id', async(req, res) => {
+        const id = req.params.id;
+        const filter = {_id: new ObjectId(id)}
+        const options = {upsert : true}
+        const updatedOrder = req.body
+        const order = {
+            $set: {
+                name: updatedOrder.name,
+                tableNumber: updatedOrder.tableNumber,
+                phone: updatedOrder.phone,
+                status: updatedOrder.status
+            }
+        }
+        const result = await ordersCollection.updateOne(filter, order, options)
+        res.send(result)
+    })
+
     // reading single Data from DB
     app.get('/coffees/:id', async(req, res) => {
         const id = req.params.id;
         const query = {_id: new ObjectId(id)};
         const result = await coffeeCollection.findOne(query)
+        res.send(result)
+    })
+    app.get('/orders/:id', async(req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await ordersCollection.findOne(query)
         res.send(result)
     })
 
